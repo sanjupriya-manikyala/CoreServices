@@ -35,11 +35,12 @@ namespace CoreServices.Models
             {
                 entity.ToTable("product");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id).HasColumnName("ID").ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    .IsUnicode(false)
+                    .IsRequired(true);
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -16,8 +16,8 @@ namespace CoreServices.Services
 
         public async Task<ProductDTO> AddAsync(ProductDTO product)
         {
-            var model = new Product()
-            {
+            var model = new Product
+            { 
                 Name = product.Name,
                 Price = product.Price
             };

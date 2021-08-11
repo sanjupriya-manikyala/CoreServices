@@ -32,8 +32,8 @@ namespace CoreServices
         {
             services.AddControllers();
             services.AddDbContext<ProductDBContext>(item => item.UseSqlServer(Configuration.GetConnectionString("ProductDBConnection")));
-            services.AddTransient<IRepository, ProductRepository>();
-            services.AddTransient<ProductService, ProductService>();
+            services.AddScoped<IRepository, ProductRepository>();
+            services.AddScoped<ProductService, ProductService>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "EFCoreServices API", Version = "v1" });
@@ -57,9 +57,7 @@ namespace CoreServices
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
 
             app.UseSwagger();

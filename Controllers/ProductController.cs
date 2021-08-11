@@ -32,13 +32,13 @@ namespace CoreServices.Controllers
                     {
                         return CreatedAtAction("Get", new { id = result.Id }, result);
                     }
-                        return NoContent();
+                        return StatusCode(StatusCodes.Status422UnprocessableEntity);
 
                 }
                 catch (Exception ex)
                 {
                     //_logger.LogInformation(StatusCodes.Status422UnprocessableEntity, ex.Message);
-                    return StatusCode(StatusCodes.Status422UnprocessableEntity, ex.Message);
+                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
                 }
 
         }
