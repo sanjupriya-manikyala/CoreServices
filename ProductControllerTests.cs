@@ -5,6 +5,7 @@ using CoreServices.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Net;
 using Xunit;
 
 namespace CoreServices.Tests
@@ -35,6 +36,7 @@ namespace CoreServices.Tests
 
             //Assert
             Assert.IsType<CreatedAtActionResult>(data);
+            Assert.IsAssignableFrom<CreatedAtActionResult>(data);
         }
 
         [Fact]
@@ -48,7 +50,8 @@ namespace CoreServices.Tests
             var data = await _productController.AddAsync(product) as CreatedAtActionResult;
             var value = data.Value as ProductDTO;
 
-            //Assert  
+            //Assert
+            Assert.NotNull(value);
             Assert.Equal(product, value);
         }
 
