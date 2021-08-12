@@ -1,6 +1,6 @@
 using CoreServices.Controllers;
 using CoreServices.DTO;
-using CoreServices.Models;
+using CoreServices.Repository;
 using CoreServices.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,48 +12,37 @@ namespace CoreServices.Tests
     public class ProductControllerTests
     {
         private readonly ProductController _productController;
+        private readonly Mock<IRepository> _repository;
         private readonly Mock<ProductService> _mockProductService;
 
         public ProductControllerTests()
         {
-            _mockProductService = new Mock<ProductService>();
+            _repository = new Mock<IRepository>();
+            _mockProductService = new Mock<ProductService>(_repository.Object);
             _productController = new ProductController(_mockProductService.Object);
         }
 
 
         [Fact]
-        public async void Task_AddAsync_ValidData_Return_OkResult()
+        public async void Task_AddAsync_PassedValidData_Return_OkResult()
         {
             //Arrange
             var product = new ProductDTO() { Id = 5, Name = "Test Name5", Price = 8120 };
+            _mockProductService.Setup(p => p.AddAsync(product)).ReturnsAsync(product);
 
             //Act  
             var data = await _productController.AddAsync(product);
 
-            //Assert  
-            Assert.IsType<OkObjectResult>(data);
-            
+            //Assert
+            Assert.IsType<CreatedAtActionResult>(data);
         }
 
         [Fact]
-        public async void Task_AddAsync_ValidData_Return_Exception()
+        public async void Task_AddAsync_PassedValidData_Return_MatchResult()
         {
             //Arrange
             var product = new ProductDTO() { Id = 5, Name = "Test Name5", Price = 8120 };
-            _productController.StatusCode(StatusCodes.Status500InternalServerError);
-
-            //Act  
-            var data = await _productController.AddAsync(product) as CreatedAtActionResult;
-
-            //Assert  
-            Assert.Equal(StatusCodes.Status500InternalServerError, data.StatusCode);
-        }
-
-        [Fact]
-        public async void Task_AddAsync_ValidData_Return_MatchResult()
-        {
-            //Arrange
-            var product = new ProductDTO() { Id = 5, Name = "Test Name5", Price = 8120 };
+            _mockProductService.Setup(p => p.AddAsync(product)).ReturnsAsync(product);
 
             //Act  
             var data = await _productController.AddAsync(product) as CreatedAtActionResult;
@@ -64,20 +53,20 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public void Add_ValidDataPassed_Return_MatchResult()
+        public async void Task_AddAsync_PassedInValidData_Return_BadRequest()
         {
-            //Arrange  
-            var factory = new ConnectionFactory();
-            var context = factory.CreateContextForInMemory();
-
-            var product = new Product() { Id = 5, Name = "Test Name3", Price = 7150 };
+            //Arrange
+            var product = new ProductDTO() { Id = 5, Name = "Test Name5", Price = 8120 };
+            _mockProductService.Setup(p => p.AddAsync(product)).ReturnsAsync(product);
+            _productController.StatusCode(StatusCodes.Status500InternalServerError);
 
             //Act  
-            var data = context.Products.Add(product);
-            context.SaveChanges();
+            var data = await _productController.AddAsync(product : null);
 
             //Assert
-            Assert.Equal(product, data.Entity);
+            var resulttype = Assert.IsType<StatusCodeResult>(data);
+            Assert.Equal(StatusCodes.Status422UnprocessableEntity, resulttype.StatusCode);
+
         }
     }
 }
