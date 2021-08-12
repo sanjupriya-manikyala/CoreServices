@@ -14,7 +14,7 @@ namespace CoreServices.Services
             _repository = repository;
         }
 
-        public async Task<ProductDTO> AddAsync(ProductDTO product)
+        public virtual async Task<ProductDTO> AddAsync(ProductDTO product)
         {
             var model = new Product
             { 
