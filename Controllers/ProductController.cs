@@ -2,6 +2,7 @@
 using CoreServices.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -12,12 +13,12 @@ namespace CoreServices.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ProductService _productService;
-        //private readonly ILogger _logger;
+        private readonly ILogger _logger;
 
-        public ProductController(ProductService productService)
+        public ProductController(ProductService productService, ILogger logger)
         {
             _productService = productService;
-            //_logger = logger;
+            _logger = logger;
 
         }
 
@@ -36,7 +37,7 @@ namespace CoreServices.Controllers
                 }
                 catch (Exception ex)
                 {
-                    //_logger.LogInformation(StatusCodes.Status422UnprocessableEntity, ex.Message);
+                    _logger.LogInformation(StatusCodes.Status422UnprocessableEntity, ex.Message);
                     return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
                 }
 
