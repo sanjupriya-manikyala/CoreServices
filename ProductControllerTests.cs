@@ -1,5 +1,7 @@
+using AutoFixture;
 using CoreServices.Controllers;
 using CoreServices.DTO;
+using CoreServices.Models;
 using CoreServices.Repository;
 using CoreServices.Services;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +31,8 @@ namespace CoreServices.Tests
         public async void Task_AddAsync_PassedValidData_Return_OkResult()
         {
             //Arrange
-            var product = new ProductDTO() { Id = 5, Name = "Test Name5", Price = 8120 };
+            var fixture = new Fixture();
+            var product = fixture.Create<ProductDTO>();
             _mockProductService.Setup(p => p.AddAsync(product)).ReturnsAsync(product);
 
             //Act  
@@ -44,7 +47,8 @@ namespace CoreServices.Tests
         public async void Task_AddAsync_PassedValidData_Return_MatchResult()
         {
             //Arrange
-            var product = new ProductDTO() { Id = 5, Name = "Test Name5", Price = 8120 };
+            var fixture = new Fixture();
+            var product = fixture.Create<ProductDTO>();
             _mockProductService.Setup(p => p.AddAsync(product)).ReturnsAsync(product);
 
             //Act  
@@ -60,7 +64,8 @@ namespace CoreServices.Tests
         public async void Task_AddAsync_PassedInValidData_Return_BadRequest()
         {
             //Arrange
-            var product = new ProductDTO { Id = 5, Name = "Test Name5", Price = 8120 };
+            var fixture = new Fixture();
+            var product = fixture.Create<ProductDTO>();
             _mockProductService.Setup(p => p.AddAsync(product)).ReturnsAsync(product);
             _productController.StatusCode(StatusCodes.Status500InternalServerError);
 
