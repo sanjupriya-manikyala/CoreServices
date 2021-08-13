@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.Net;
 using Xunit;
 
 namespace CoreServices.Tests
@@ -37,8 +36,8 @@ namespace CoreServices.Tests
             var data = await _productController.AddAsync(product);
 
             //Assert
-            Assert.IsType<CreatedAtActionResult>(data);
-            Assert.IsAssignableFrom<CreatedAtActionResult>(data);
+            var resulttype = Assert.IsType<CreatedAtActionResult>(data);
+            Assert.Equal(typeof(CreatedAtActionResult), resulttype.GetType());
         }
 
         [Fact]
@@ -66,12 +65,13 @@ namespace CoreServices.Tests
             _productController.StatusCode(StatusCodes.Status500InternalServerError);
 
             //Act  
-            var data = await _productController.AddAsync(product : null);
+            var data = await _productController.AddAsync(product: null);
 
             //Assert
             var resulttype = Assert.IsType<StatusCodeResult>(data);
             Assert.Equal(StatusCodes.Status422UnprocessableEntity, resulttype.StatusCode);
 
         }
+
     }
 }
