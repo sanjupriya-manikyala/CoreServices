@@ -1,11 +1,9 @@
 ﻿using AutoFixture;
 using CoreServices.Models;
 using CoreServices.Repository;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
+using System;
 
 namespace CoreServices.Tests
 {
@@ -13,14 +11,11 @@ namespace CoreServices.Tests
     {
         private readonly Mock<ProductDBContext> _dbContext;
         private readonly ProductRepository _productRepository;
-        private readonly Mock<DbSet<Product>> _mockProducts;
 
         public ProductRepositoryTests()
         {
             _dbContext = new Mock<ProductDBContext>();
             _productRepository = new ProductRepository(_dbContext.Object);
-            _mockProducts = new Mock<DbSet<Product>>();
-
         }
 
         [Fact]
@@ -35,7 +30,8 @@ namespace CoreServices.Tests
             var data = await _productRepository.AddAsync(product);
 
             //Assert
-            Assert.IsType<CreatedAtActionResult>(data);
+            Assert.NotNull(data);
+            Assert.IsType<Product>(data);
         }
 
         [Fact]
@@ -50,24 +46,27 @@ namespace CoreServices.Tests
             var data = await _productRepository.AddAsync(product);
 
             //Assert
-            Assert.IsType<CreatedAtActionResult>(data);
+            Assert.NotNull(data);
+            Assert.IsType<Product>(data);
             Assert.Equal(product, data);
         }
 
         [Fact]
-        public async void AddAsync_PassedValidData_Return_Exception()
+        public async void AddAsync_PassedInValidData_Return_BadRequest()
         {
             //Arrange
             var fixture = new Fixture();
             var product = fixture.Create<Product>();
-            _dbContext.Setup(p => p.Products.Add(product));
+            var exception = fixture.Create<Exception>();
+            _dbContext.Setup(p => p.Products.Add(product)).Throws(exception);
 
             //Act
-            var data = await _productRepository.AddAsync(product : null);
+            var data = await Assert.ThrowsAsync<Exception>(() => _productRepository.AddAsync(product));
 
             //Assert
-            var resultType = Assert.IsType<StatusCodeResult>(data);
-            Assert.Equal(StatusCodes.Status422UnprocessableEntity, resultType.StatusCode);
+            Assert.NotNull(data);
+            Assert.IsType<Exception>(data);
+            Assert.Equal(exception.Message, data.Message);
         }
     }
 }

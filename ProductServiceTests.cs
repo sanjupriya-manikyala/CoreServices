@@ -6,6 +6,7 @@ using CoreServices.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
 using Xunit;
 
 namespace CoreServices.Tests
@@ -34,7 +35,8 @@ namespace CoreServices.Tests
             var data = await _productService.AddAsync(dto);
 
             //Assert
-            Assert.IsType<CreatedAtActionResult>(data);
+            Assert.NotNull(data);
+            Assert.IsType<ProductDTO>(data);
         }
 
         [Fact]
@@ -50,25 +52,28 @@ namespace CoreServices.Tests
             var data = await _productService.AddAsync(dto);
 
             //Assert
+            Assert.NotNull(data);
+            Assert.IsType<ProductDTO>(data);
             Assert.Equal(dto, data);
         }
 
         [Fact]
-        public async void AddAsync_PassedValidData_Return_Exception()
+        public async void AddAsync_PassedValidData_Return_BadRequest()
         {
             //Arrange
             var fixture = new Fixture();
             var product = fixture.Create<Product>();
             var dto = fixture.Create<ProductDTO>();
-            _repository.Setup(p => p.AddAsync(product)).ReturnsAsync(product);
+            var exception = fixture.Create<Exception>();
+            _repository.Setup(p => p.AddAsync(product)).Throws(exception);
 
             //Act
-            var data = await _productService.AddAsync(dto);
-            data = null;
+            var data = await Assert.ThrowsAsync<Exception>(() => _productService.AddAsync(dto));
 
             //Assert
-            var resultType = Assert.IsType<CreatedAtActionResult>(data);
-            Assert.Equal(StatusCodes.Status422UnprocessableEntity, resultType.StatusCode);
+            Assert.NotNull(data);
+            Assert.IsType<Exception>(data);
+            Assert.Equal(exception.Message, data.Message);
         }
     }
 }
