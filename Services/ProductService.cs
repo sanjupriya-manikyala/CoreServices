@@ -27,9 +27,7 @@ namespace CoreServices.Services
                 product.Name = result.Name;
                 product.Price = result.Price;
             };
-
             return product;
-
         }
     }
 }

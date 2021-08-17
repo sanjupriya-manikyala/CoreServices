@@ -19,7 +19,6 @@ namespace CoreServices.Controllers
         {
             _productService = productService;
             _logger = logger;
-
         }
 
         [HttpPost]
@@ -33,14 +32,12 @@ namespace CoreServices.Controllers
                         return CreatedAtAction("Get", new { id = result.Id }, result);
                     }
                         return StatusCode(StatusCodes.Status422UnprocessableEntity);
-
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(StatusCodes.Status422UnprocessableEntity, ex.Message);
                     return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
                 }
-
         }
     }
 }

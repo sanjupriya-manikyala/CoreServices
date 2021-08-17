@@ -1,8 +1,6 @@
 ﻿
 #nullable disable
 
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace CoreServices.Models
 {
     public partial class Product

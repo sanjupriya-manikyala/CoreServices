@@ -13,7 +13,6 @@ namespace CoreServices.Repository
 
         public async Task<Product> AddAsync(Product product)
         {
-
             var result = await _dbContext.AddAsync(product);
             await _dbContext.SaveChangesAsync();
             return result.Entity;
