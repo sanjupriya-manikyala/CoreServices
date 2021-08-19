@@ -25,19 +25,19 @@ namespace CoreServices.Controllers
         public async Task<IActionResult> AddAsync([FromBody] ProductDTO product)
         {
               try
+              {
+                var result = await _productService.AddAsync(product);
+                if (result != null)
                 {
-                    var result = await _productService.AddAsync(product);
-                    if (result != null)
-                    {
-                        return CreatedAtAction("Get", new { id = result.Id }, result);
-                    }
-                        return StatusCode(StatusCodes.Status422UnprocessableEntity);
+                    return CreatedAtAction("Get", new { id = result.Id }, result);
                 }
-                catch (Exception ex)
-                {
+                return StatusCode(StatusCodes.Status422UnprocessableEntity);
+              }
+              catch (Exception ex)
+              {
                     _logger.LogError(StatusCodes.Status422UnprocessableEntity, ex.Message);
                     return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-                }
+              }
         }
     }
 }
