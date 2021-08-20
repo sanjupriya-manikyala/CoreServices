@@ -35,7 +35,7 @@ namespace CoreServices.Controllers
               }
               catch (Exception ex)
               {
-                    _logger.LogError(StatusCodes.Status422UnprocessableEntity, ex.Message);
+                    _logger.LogError(ex, ex.Message);
                     return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
               }
         }
