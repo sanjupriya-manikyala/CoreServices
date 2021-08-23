@@ -1,6 +1,7 @@
 ﻿using CoreServices.DTO;
 using CoreServices.Models;
 using CoreServices.Repository;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CoreServices.Services
@@ -28,6 +29,22 @@ namespace CoreServices.Services
                 product.Price = result.Price;
             };
             return product;
+        }
+
+        public virtual async Task<List<ProductDTO>> GetProductsAsync()
+        {
+            var products = await _repository.GetProductsAsync();
+            List<ProductDTO> result = new List<ProductDTO>();
+            foreach(Product product in products)
+            {
+                result.Add(new ProductDTO()
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Price = product.Price
+                });
+            }
+            return result;
         }
     }
 }

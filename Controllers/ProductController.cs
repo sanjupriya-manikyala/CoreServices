@@ -39,5 +39,24 @@ namespace CoreServices.Controllers
                     return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
               }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProductsAsync()
+        {
+            try
+            {
+                var products = await _productService.GetProductsAsync();
+                if (products != null)
+                {
+                    return CreatedAtAction("Get", products);
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }

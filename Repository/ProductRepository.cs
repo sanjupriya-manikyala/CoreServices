@@ -1,4 +1,6 @@
 ﻿using CoreServices.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CoreServices.Repository
@@ -16,6 +18,13 @@ namespace CoreServices.Repository
             var result = await _dbContext.AddAsync(product);
             await _dbContext.SaveChangesAsync();
             return result.Entity;
+        }
+
+        public async Task<List<Product>> GetProductsAsync()
+        {
+
+            return await _dbContext.Products.ToListAsync();
+
         }
     }
 }
