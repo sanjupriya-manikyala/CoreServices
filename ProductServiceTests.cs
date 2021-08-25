@@ -1,17 +1,15 @@
 ﻿using AutoFixture;
-using AutoFixture.AutoMoq;
 using CoreServices.DTO;
 using CoreServices.Models;
 using CoreServices.Repository;
 using CoreServices.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
+using AutoMapper;
 
 namespace CoreServices.Tests
 {
@@ -19,11 +17,13 @@ namespace CoreServices.Tests
     {
         private readonly Mock<IRepository> _repository;
         private readonly ProductService _productService;
+        private readonly Mock<IMapper> _mapper;
 
         public ProductServiceTests()
         {
+            _mapper = new Mock<IMapper>();
             _repository = new Mock<IRepository>();
-            _productService = new ProductService(_repository.Object);
+            _productService = new ProductService(_repository.Object, _mapper.Object);
         }
 
         [Fact]
@@ -93,21 +93,13 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public async Task GetProductsAsync_GivenInValidData_ReturnOk()
+        public async Task GetProductsAsync_ReturnsProducts()
         {
             //Arrange
             var fixture = new Fixture();
             var product = fixture.Create<List<Product>>();
-            List<ProductDTO> dto = new List<ProductDTO>();
-            foreach(Product p in product)
-            {
-                dto.Add(new ProductDTO()
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price
-                });
-            }
+            var expected = fixture.Create<List<ProductDTO>>();
+            _mapper.Setup(x => x.Map<List<ProductDTO>>(product)).Returns(expected);
             _repository.Setup(p => p.GetProductsAsync()).ReturnsAsync(product);
 
             //Act
@@ -116,53 +108,18 @@ namespace CoreServices.Tests
             //Assert
             Assert.NotNull(data);
             Assert.IsType<List<ProductDTO>>(data);
+            expected.Should().HaveSameCount(product);
+            expected.Should().BeEquivalentTo(data);
         }
 
         [Fact]
-        public async Task GetProductsAsync_GivenInValidData_ReturnsProducts()
+        public async Task GetProductsAsync_ReturnBadRequest()
         {
             //Arrange
             var fixture = new Fixture();
             var product = fixture.Create<List<Product>>();
-            List<ProductDTO> dto = new List<ProductDTO>();
-            foreach (Product p in product)
-            {
-                dto.Add(new ProductDTO()
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price
-                });
-            }
-            _repository.Setup(p => p.GetProductsAsync()).ReturnsAsync(product);
-
-            //Act
-            var data = await _productService.GetProductsAsync();
-
-            //Assert
-            Assert.NotNull(data);
-            Assert.IsType<List<ProductDTO>>(data);
-            dto.Should().HaveSameCount(data);
-            dto.Should().BeEquivalentTo(data);
-        }
-
-
-        [Fact]
-        public async Task GetProductsAsync_GivenInValidData_ReturnBadRequest()
-        {
-            //Arrange
-            var fixture = new Fixture();
-            var product = fixture.Create<List<Product>>();
-            List<ProductDTO> dto = new List<ProductDTO>();
-            foreach(Product p in product)
-            {
-                dto.Add(new ProductDTO()
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price
-                });
-            }
+            var expected = fixture.Create<List<ProductDTO>>();
+            _mapper.Setup(x => x.Map<List<ProductDTO>>(product)).Returns(expected);
             var exception = fixture.Create<Exception>();
             _repository.Setup(p => p.GetProductsAsync()).ThrowsAsync(exception);
 

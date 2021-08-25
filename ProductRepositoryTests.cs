@@ -32,7 +32,7 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public async Task GetProductsAsync_GivenValidData_ReturnsProduct()
+        public async Task GetProductsAsync_ReturnsProduct()
         {
             //Arrange  
             var factory = new ConnectionFactory();
@@ -52,9 +52,8 @@ namespace CoreServices.Tests
             //Assert
             Assert.NotNull(result);
             Assert.IsType<List<Product>>(result);
-            products.Should().BeEquivalentTo(result);
+            result.Should().BeEquivalentTo(products);
         }
-
     }
 }
             

@@ -1,4 +1,5 @@
 using AutoFixture;
+using AutoMapper;
 using CoreServices.Controllers;
 using CoreServices.DTO;
 using CoreServices.Repository;
@@ -20,12 +21,14 @@ namespace CoreServices.Tests
         private readonly ILogger _logger;
         private readonly Mock<IRepository> _repository;
         private readonly Mock<ProductService> _mockProductService;
+        private readonly Mock<IMapper> _mapper;
 
         public ProductControllerTests()
         {
+            _mapper = new Mock<IMapper>();
             _logger = new Mock<ILogger>().Object;
             _repository = new Mock<IRepository>();
-            _mockProductService = new Mock<ProductService>(_repository.Object);
+            _mockProductService = new Mock<ProductService>(_repository.Object, _mapper.Object);
             _productController = new ProductController(_mockProductService.Object, _logger);
         }
 
@@ -46,7 +49,6 @@ namespace CoreServices.Tests
             Assert.NotNull(data);
             Assert.IsType<CreatedAtActionResult>(data);
             Assert.Equal(product, result);
-
             _mockProductService.VerifyAll();
         }
 
@@ -66,7 +68,6 @@ namespace CoreServices.Tests
             Assert.NotNull(value);
             Assert.IsType<CreatedAtActionResult>(data);
             Assert.Equal(product, value);
-
             _mockProductService.VerifyAll();
         }
 
@@ -87,7 +88,6 @@ namespace CoreServices.Tests
             Assert.NotNull(data);
             Assert.Equal(exception.Message, data.Value);
             Assert.Equal(StatusCodes.Status500InternalServerError, result);
-
             _mockProductService.VerifyAll();
         }
 
@@ -107,12 +107,11 @@ namespace CoreServices.Tests
             Assert.NotNull(data);
             Assert.IsType<StatusCodeResult>(data);
             Assert.Equal(StatusCodes.Status422UnprocessableEntity, result);
-
             _mockProductService.VerifyAll();
         }
 
         [Fact]
-        public async Task GetProductsAsync_GivenValidData_ReturnsOk()
+        public async Task GetProductsAsync_ReturnsProducts()
         {
             //Arrange
             var fixture = new Fixture();
@@ -120,35 +119,17 @@ namespace CoreServices.Tests
             _mockProductService.Setup(p => p.GetProductsAsync()).ReturnsAsync(products);
 
             //Act
-            var data = await _productController.GetProductsAsync() as CreatedAtActionResult;
-            var result = data.Value;
-
-            //Assert
-            Assert.NotNull(data);
-            Assert.IsType<CreatedAtActionResult>(data);
-            Assert.Equal(products, result);
-        }
-
-        [Fact]
-        public async Task GetProductsAsync_GivenValidData_ReturnsProducts()
-        {
-            //Arrange
-            var fixture = new Fixture();
-            var products = fixture.Create<List<ProductDTO>>();
-            _mockProductService.Setup(p => p.GetProductsAsync()).ReturnsAsync(products);
-
-            //Act
-            var data = await _productController.GetProductsAsync() as CreatedAtActionResult;
+            var data = await _productController.GetProductsAsync() as OkObjectResult;
             var result = data.Value as List<ProductDTO>;
 
             //Assert
             Assert.NotNull(data);
-            Assert.IsType<CreatedAtActionResult>(data);
+            Assert.IsType<OkObjectResult>(data);
             Assert.Equal(products, result);
         }
 
         [Fact]
-        public async Task GetProductsAsync_GivenInValidData_ReturnBadRequest()
+        public async Task GetProductsAsync_ReturnBadRequest()
         {
             //Arrange
             var fixture = new Fixture();
@@ -164,12 +145,11 @@ namespace CoreServices.Tests
             Assert.NotNull(data);
             Assert.Equal(exception.Message, data.Value);
             Assert.Equal(StatusCodes.Status500InternalServerError, result);
-
             _mockProductService.VerifyAll();
         }
 
         [Fact]
-        public async Task GetProductsAsync_GivenInValidData_ReturnsException()
+        public async Task GetProductsAsync_ReturnsException()
         {
             //Arrange
             var fixture = new Fixture();
@@ -184,7 +164,6 @@ namespace CoreServices.Tests
             Assert.NotNull(data);
             Assert.IsType<NoContentResult>(data);
             Assert.Equal(StatusCodes.Status204NoContent, result);
-
             _mockProductService.VerifyAll();
         }
     }
