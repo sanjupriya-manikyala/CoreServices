@@ -1,4 +1,5 @@
 using CoreServices.Models;
+using CoreServices.Profiles;
 using CoreServices.Repository;
 using CoreServices.Services;
 using Microsoft.AspNetCore.Builder;
@@ -33,7 +34,8 @@ namespace CoreServices
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "EFCoreServices API", Version = "v1" });
 
             });
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddAutoMapper(typeof(ProductProfile).Assembly);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
