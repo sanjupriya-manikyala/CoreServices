@@ -1,4 +1,5 @@
-﻿using CoreServices.DTO;
+﻿using AutoMapper;
+using CoreServices.DTO;
 using CoreServices.Models;
 using CoreServices.Repository;
 using System.Collections.Generic;
@@ -9,9 +10,11 @@ namespace CoreServices.Services
     public class ProductService
     {
         private readonly IRepository _repository;
+        private readonly IMapper _mapper;
 
-        public ProductService(IRepository repository)
+        public ProductService(IRepository repository, IMapper mapper)
         {
+            _mapper = mapper;
             _repository = repository;
         }
 
@@ -34,17 +37,7 @@ namespace CoreServices.Services
         public virtual async Task<List<ProductDTO>> GetProductsAsync()
         {
             var products = await _repository.GetProductsAsync();
-            List<ProductDTO> result = new List<ProductDTO>();
-            foreach(Product product in products)
-            {
-                result.Add(new ProductDTO()
-                {
-                    Id = product.Id,
-                    Name = product.Name,
-                    Price = product.Price
-                });
-            }
-            return result;
+            return _mapper.Map<List<ProductDTO>>(products); 
         }
     }
 }

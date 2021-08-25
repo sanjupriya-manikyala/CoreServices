@@ -14,7 +14,6 @@ namespace CoreServices.Controllers
     {
         private readonly ProductService _productService;
         private readonly ILogger _logger;
-
         public ProductController(ProductService productService, ILogger logger)
         {
             _productService = productService;
@@ -48,13 +47,13 @@ namespace CoreServices.Controllers
                 var products = await _productService.GetProductsAsync();
                 if (products != null)
                 {
-                    return CreatedAtAction("Get", products);
+                    return Ok(products);
                 }
                 return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(StatusCodes.Status500InternalServerError, ex.Message);
+                _logger.LogError(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }

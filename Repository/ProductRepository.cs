@@ -22,9 +22,7 @@ namespace CoreServices.Repository
 
         public async Task<List<Product>> GetProductsAsync()
         {
-
             return await _dbContext.Products.ToListAsync();
-
         }
     }
 }
