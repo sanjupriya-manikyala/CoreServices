@@ -3,6 +3,7 @@ using CoreServices.Models;
 using CoreServices.Repository;
 using FluentAssertions;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -38,8 +39,8 @@ namespace CoreServices.Tests
             var factory = new ConnectionFactory();
             var context = factory.CreateContextForInMemory();
             var fixture = new Fixture();
-            var products = fixture.Create<List<Product>>();
-            foreach(Product p in products)
+            var products = fixture.CreateMany<Product>().ToList();
+            foreach (Product p in products)
             {
                 context.Products.Add(p);
             }

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -115,7 +116,7 @@ namespace CoreServices.Tests
         {
             //Arrange
             var fixture = new Fixture();
-            var products = fixture.Create<List<ProductDTO>>();
+            var products = fixture.CreateMany<ProductDTO>().ToList();
             _mockProductService.Setup(p => p.GetProductsAsync()).ReturnsAsync(products);
 
             //Act
@@ -129,11 +130,11 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public async Task GetProductsAsync_ReturnBadRequest()
+        public async Task GetProductsAsync_ThrowsException()
         {
             //Arrange
             var fixture = new Fixture();
-            var product = fixture.Create<List<ProductDTO>>();
+            var product = fixture.CreateMany<ProductDTO>().ToList();
             var exception = fixture.Create<Exception>();
             _mockProductService.Setup(p => p.GetProductsAsync()).ThrowsAsync(exception);
 
@@ -149,11 +150,11 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public async Task GetProductsAsync_ReturnsException()
+        public async Task GetProductsAsync_ReturnsNoContent()
         {
             //Arrange
             var fixture = new Fixture();
-            var product = fixture.Create<List<ProductDTO>>();
+            var product = fixture.CreateMany<ProductDTO>().ToList();
             _mockProductService.Setup(p => p.GetProductsAsync()).ReturnsAsync((List<ProductDTO>)null);
 
             //Act  

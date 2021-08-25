@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using AutoMapper;
+using System.Linq;
+using CoreServices.Profiles;
 
 namespace CoreServices.Tests
 {
@@ -17,13 +19,19 @@ namespace CoreServices.Tests
     {
         private readonly Mock<IRepository> _repository;
         private readonly ProductService _productService;
-        private readonly Mock<IMapper> _mapper;
+        private readonly IMapper _mapper;
 
         public ProductServiceTests()
         {
-            _mapper = new Mock<IMapper>();
+            var mappingConfig = new MapperConfiguration(c =>
+            {
+                c.AddProfile(new ProductProfile());
+            });
+            IMapper mapper = mappingConfig.CreateMapper();
+            _mapper = mapper;
+            mapper.ConfigurationProvider.AssertConfigurationIsValid();
             _repository = new Mock<IRepository>();
-            _productService = new ProductService(_repository.Object, _mapper.Object);
+            _productService = new ProductService(_repository.Object, _mapper);
         }
 
         [Fact]
@@ -97,9 +105,7 @@ namespace CoreServices.Tests
         {
             //Arrange
             var fixture = new Fixture();
-            var product = fixture.Create<List<Product>>();
-            var expected = fixture.Create<List<ProductDTO>>();
-            _mapper.Setup(x => x.Map<List<ProductDTO>>(product)).Returns(expected);
+            var product = fixture.CreateMany<Product>().ToList();
             _repository.Setup(p => p.GetProductsAsync()).ReturnsAsync(product);
 
             //Act
@@ -108,18 +114,16 @@ namespace CoreServices.Tests
             //Assert
             Assert.NotNull(data);
             Assert.IsType<List<ProductDTO>>(data);
-            expected.Should().HaveSameCount(product);
-            expected.Should().BeEquivalentTo(data);
+            product.Should().HaveSameCount(data);
+            product.Should().BeEquivalentTo(data);
         }
 
         [Fact]
-        public async Task GetProductsAsync_ReturnBadRequest()
+        public async Task GetProductsAsync_ReturnsException()
         {
             //Arrange
             var fixture = new Fixture();
-            var product = fixture.Create<List<Product>>();
-            var expected = fixture.Create<List<ProductDTO>>();
-            _mapper.Setup(x => x.Map<List<ProductDTO>>(product)).Returns(expected);
+            var product = fixture.CreateMany<Product>().ToList();
             var exception = fixture.Create<Exception>();
             _repository.Setup(p => p.GetProductsAsync()).ThrowsAsync(exception);
 
