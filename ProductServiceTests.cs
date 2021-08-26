@@ -29,7 +29,6 @@ namespace CoreServices.Tests
             });
             IMapper mapper = mappingConfig.CreateMapper();
             _mapper = mapper;
-            mapper.ConfigurationProvider.AssertConfigurationIsValid();
             _repository = new Mock<IRepository>();
             _productService = new ProductService(_repository.Object, _mapper);
         }

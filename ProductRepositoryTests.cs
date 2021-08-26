@@ -11,7 +11,6 @@ namespace CoreServices.Tests
 {
     public class ProductRepositoryTests
     {
-
         [Fact]
         public async Task AddAsync_GivenValidData_ReturnsProduct()
         {

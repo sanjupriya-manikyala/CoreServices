@@ -2,6 +2,7 @@ using AutoFixture;
 using AutoMapper;
 using CoreServices.Controllers;
 using CoreServices.DTO;
+using CoreServices.Profiles;
 using CoreServices.Repository;
 using CoreServices.Services;
 using Microsoft.AspNetCore.Http;
@@ -22,17 +23,21 @@ namespace CoreServices.Tests
         private readonly ILogger _logger;
         private readonly Mock<IRepository> _repository;
         private readonly Mock<ProductService> _mockProductService;
-        private readonly Mock<IMapper> _mapper;
+        private readonly IMapper _mapper;
 
         public ProductControllerTests()
         {
-            _mapper = new Mock<IMapper>();
+            var mappingConfig = new MapperConfiguration(c =>
+            {
+                c.AddProfile(new ProductProfile());
+            });
+            IMapper mapper = mappingConfig.CreateMapper();
+            _mapper = mapper;
             _logger = new Mock<ILogger>().Object;
             _repository = new Mock<IRepository>();
-            _mockProductService = new Mock<ProductService>(_repository.Object, _mapper.Object);
+            _mockProductService = new Mock<ProductService>(_repository.Object, _mapper);
             _productController = new ProductController(_mockProductService.Object, _logger);
         }
-
 
         [Fact]
         public async Task Task_AddAsync_PassedValidData_Return_OkResult()
