@@ -23,7 +23,6 @@ namespace CoreServices.Tests
         private readonly ILogger _logger;
         private readonly Mock<IRepository> _repository;
         private readonly Mock<ProductService> _mockProductService;
-        private readonly IMapper _mapper;
 
         public ProductControllerTests()
         {
@@ -31,11 +30,10 @@ namespace CoreServices.Tests
             {
                 c.AddProfile(new ProductProfile());
             });
-            IMapper mapper = mappingConfig.CreateMapper();
-            _mapper = mapper;
+            var mapper = mappingConfig.CreateMapper();
             _logger = new Mock<ILogger>().Object;
             _repository = new Mock<IRepository>();
-            _mockProductService = new Mock<ProductService>(_repository.Object, _mapper);
+            _mockProductService = new Mock<ProductService>(_repository.Object, mapper);
             _productController = new ProductController(_mockProductService.Object, _logger);
         }
 
@@ -117,7 +115,7 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public async Task GetProductsAsync_ReturnsProducts()
+        public async Task GetProductsAsync_WhenProductsExists_ReturnsProducts()
         {
             //Arrange
             var fixture = new Fixture();
@@ -135,11 +133,11 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public async Task GetProductsAsync_ThrowsException()
+        public async Task GetProductsAsync_WhenThrowsException_ReturnsInternalServerError()
         {
             //Arrange
             var fixture = new Fixture();
-            var product = fixture.CreateMany<ProductDTO>().ToList();
+            var products = fixture.CreateMany<ProductDTO>().ToList();
             var exception = fixture.Create<Exception>();
             _mockProductService.Setup(p => p.GetProductsAsync()).ThrowsAsync(exception);
 
@@ -155,11 +153,11 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public async Task GetProductsAsync_ReturnsNoContent()
+        public async Task GetProductsAsync_WhenProductdoesntExist_ReturnsNoContent()
         {
             //Arrange
             var fixture = new Fixture();
-            var product = fixture.CreateMany<ProductDTO>().ToList();
+            var products = fixture.CreateMany<ProductDTO>().ToList();
             _mockProductService.Setup(p => p.GetProductsAsync()).ReturnsAsync((List<ProductDTO>)null);
 
             //Act  
