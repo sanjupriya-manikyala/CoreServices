@@ -34,7 +34,6 @@ namespace CoreServices
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "EFCoreServices API", Version = "v1" });
 
             });
-            //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddAutoMapper(typeof(ProductProfile));
         }
 
