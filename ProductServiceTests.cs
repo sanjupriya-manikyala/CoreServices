@@ -19,18 +19,15 @@ namespace CoreServices.Tests
     {
         private readonly Mock<IRepository> _repository;
         private readonly ProductService _productService;
-        private readonly IMapper _mapper;
-
         public ProductServiceTests()
         {
             var mappingConfig = new MapperConfiguration(c =>
             {
                 c.AddProfile(new ProductProfile());
             });
-            IMapper mapper = mappingConfig.CreateMapper();
-            _mapper = mapper;
+            var mapper = mappingConfig.CreateMapper();
             _repository = new Mock<IRepository>();
-            _productService = new ProductService(_repository.Object, _mapper);
+            _productService = new ProductService(_repository.Object, mapper);
         }
 
         [Fact]
@@ -100,12 +97,12 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public async Task GetProductsAsync_ReturnsProducts()
+        public async Task GetProductsAsync_WhenProductsExists_ReturnsProducts()
         {
             //Arrange
             var fixture = new Fixture();
-            var product = fixture.CreateMany<Product>().ToList();
-            _repository.Setup(p => p.GetProductsAsync()).ReturnsAsync(product);
+            var products = fixture.CreateMany<Product>().ToList();
+            _repository.Setup(p => p.GetProductsAsync()).ReturnsAsync(products);
 
             //Act
             var data = await _productService.GetProductsAsync();
@@ -113,16 +110,16 @@ namespace CoreServices.Tests
             //Assert
             Assert.NotNull(data);
             Assert.IsType<List<ProductDTO>>(data);
-            product.Should().HaveSameCount(data);
-            product.Should().BeEquivalentTo(data);
+            data.Should().HaveSameCount(products);
+            data.Should().BeEquivalentTo(products);
         }
 
         [Fact]
-        public async Task GetProductsAsync_ReturnsException()
+        public async Task GetProductsAsync_WhenProductdoesntExist_ReturnsException()
         {
             //Arrange
             var fixture = new Fixture();
-            var product = fixture.CreateMany<Product>().ToList();
+            var products = fixture.CreateMany<Product>().ToList();
             var exception = fixture.Create<Exception>();
             _repository.Setup(p => p.GetProductsAsync()).ThrowsAsync(exception);
 

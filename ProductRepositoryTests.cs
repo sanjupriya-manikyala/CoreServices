@@ -32,14 +32,14 @@ namespace CoreServices.Tests
         }
 
         [Fact]
-        public async Task GetProductsAsync_ReturnsProduct()
+        public async Task GetProductsAsync_WhenProductsExists_ReturnsProducts()
         {
             //Arrange  
             var factory = new ConnectionFactory();
             var context = factory.CreateContextForInMemory();
             var fixture = new Fixture();
             var products = fixture.CreateMany<Product>().ToList();
-            foreach (Product p in products)
+            foreach (var p in products)
             {
                 context.Products.Add(p);
             }

@@ -5,7 +5,6 @@ namespace CoreServices.Tests
 {
     class ProductProfileTests
     {
-        private readonly IMapper _mapper;
         public ProductProfileTests()
         {
             var mappingConfig = new MapperConfiguration(c =>
@@ -13,7 +12,6 @@ namespace CoreServices.Tests
                 c.AddProfile(new ProductProfile());
             });
             IMapper mapper = mappingConfig.CreateMapper();
-            _mapper = mapper;
             mapper.ConfigurationProvider.AssertConfigurationIsValid();
         }        
     }
